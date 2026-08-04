@@ -7,11 +7,25 @@
   const overlay = document.getElementById("overlay");
   const overlayMessage = document.getElementById("overlay-message");
   const overlayBtn = document.getElementById("overlay-btn");
+  const overlayMenuBtn = document.getElementById("overlay-menu-btn");
   const newGameBtn = document.getElementById("new-game");
+  const gameMenuBtn = document.getElementById("game-menu");
   const scoreEl = document.getElementById("score");
   const bestEl = document.getElementById("best");
 
+  const menuScreen = document.getElementById("menu-screen");
+  const highscoresScreen = document.getElementById("highscores-screen");
+  const gameScreen = document.getElementById("game-screen");
+  const menuPlayBtn = document.getElementById("menu-play");
+  const menuHighscoresBtn = document.getElementById("menu-highscores");
+  const highscoresBackBtn = document.getElementById("highscores-back");
+  const highscoresList = document.getElementById("highscores-list");
+
+  const SCREENS = { menu: menuScreen, highscores: highscoresScreen, game: gameScreen };
+
   const BEST_KEY = "game-2048-best";
+  const HIGHSCORES_KEY = "game-2048-highscores";
+  const MAX_HIGHSCORES = 10;
 
   const VECTORS = {
     left: { dr: 0, dc: -1 },
@@ -31,10 +45,65 @@
   let won = false;
   let over = false;
   let animating = false;
+  let scoreSaved = false;
   let cellSize = 0;
   const gap = 12;
 
   bestEl.textContent = String(best);
+
+  function showScreen(name) {
+    Object.entries(SCREENS).forEach(([key, el]) => {
+      el.classList.toggle("hidden", key !== name);
+    });
+  }
+
+  function getHighScores() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(HIGHSCORES_KEY));
+      return Array.isArray(raw) ? raw : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveHighScore(value) {
+    if (value <= 0) return;
+    const list = getHighScores();
+    list.push({ score: value, date: Date.now() });
+    list.sort((a, b) => b.score - a.score);
+    localStorage.setItem(HIGHSCORES_KEY, JSON.stringify(list.slice(0, MAX_HIGHSCORES)));
+  }
+
+  function recordScoreOnce() {
+    if (!scoreSaved && score > 0) {
+      saveHighScore(score);
+      scoreSaved = true;
+    }
+  }
+
+  function renderHighScores() {
+    const list = getHighScores();
+    highscoresList.innerHTML = "";
+
+    if (list.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "highscores-empty";
+      empty.textContent = "No scores yet — play a game!";
+      highscoresList.appendChild(empty);
+      return;
+    }
+
+    list.forEach((entry, i) => {
+      const li = document.createElement("li");
+      const dateStr = new Date(entry.date).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+      li.innerHTML = `<span class="rank">${i + 1}</span><span class="hs-score">${entry.score}</span><span class="hs-date">${dateStr}</span>`;
+      highscoresList.appendChild(li);
+    });
+  }
 
   function inBounds(r, c) {
     return r >= 0 && r < SIZE && c >= 0 && c < SIZE;
@@ -94,6 +163,7 @@
     won = false;
     over = false;
     animating = false;
+    scoreSaved = false;
     scoreEl.textContent = "0";
     overlay.classList.add("hidden");
 
@@ -209,6 +279,7 @@
         won = false;
       } else if (!hasMoves()) {
         over = true;
+        recordScoreOnce();
         showOverlay("Game Over", "Try Again");
       }
     }, MOVE_DURATION);
@@ -263,6 +334,7 @@
   };
 
   document.addEventListener("keydown", (e) => {
+    if (gameScreen.classList.contains("hidden")) return;
     const dir = KEY_DIRS[e.key];
     if (!dir) return;
     e.preventDefault();
@@ -306,10 +378,37 @@
   newGameBtn.addEventListener("click", startGame);
   overlayBtn.addEventListener("click", startGame);
 
-  window.addEventListener("resize", () => {
-    measure();
-    updatePositions();
+  gameMenuBtn.addEventListener("click", () => {
+    recordScoreOnce();
+    showScreen("menu");
   });
 
-  startGame();
+  overlayMenuBtn.addEventListener("click", () => {
+    recordScoreOnce();
+    overlay.classList.add("hidden");
+    showScreen("menu");
+  });
+
+  menuPlayBtn.addEventListener("click", () => {
+    showScreen("game");
+    startGame();
+  });
+
+  menuHighscoresBtn.addEventListener("click", () => {
+    renderHighScores();
+    showScreen("highscores");
+  });
+
+  highscoresBackBtn.addEventListener("click", () => {
+    showScreen("menu");
+  });
+
+  window.addEventListener("resize", () => {
+    if (!gameScreen.classList.contains("hidden")) {
+      measure();
+      updatePositions();
+    }
+  });
+
+  showScreen("menu");
 })();

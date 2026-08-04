@@ -10,38 +10,67 @@
 </head>
 <body>
   <div class="wrap">
-    <header class="header">
-      <h1 class="title">2048</h1>
-      <div class="scores">
-        <div class="score-box">
-          <span class="score-label">Score</span>
-          <span id="score" class="score-value">0</span>
+
+    <section id="menu-screen" class="screen">
+      <div class="menu">
+        <h1 class="title menu-title">2048</h1>
+        <p class="menu-tagline">Join the tiles, get to <strong>2048!</strong></p>
+        <div class="menu-actions">
+          <button id="menu-play" class="btn btn-large">Play</button>
+          <button id="menu-highscores" class="btn btn-large btn-secondary">High Scores</button>
         </div>
-        <div class="score-box">
-          <span class="score-label">Best</span>
-          <span id="best" class="score-value">0</span>
+        <p class="menu-footnote">Use arrow keys or swipe to move the tiles.</p>
+      </div>
+    </section>
+
+    <section id="highscores-screen" class="screen hidden">
+      <div class="menu">
+        <h2 class="title menu-title">High Scores</h2>
+        <ol id="highscores-list" class="highscores-list"></ol>
+        <div class="menu-actions">
+          <button id="highscores-back" class="btn btn-large">Back</button>
         </div>
       </div>
-    </header>
+    </section>
 
-    <div class="toolbar">
-      <p class="hint">Join the tiles, get to <strong>2048!</strong></p>
-      <button id="new-game" class="btn">New Game</button>
-    </div>
+    <section id="game-screen" class="screen hidden">
+      <header class="header">
+        <h1 class="title">2048</h1>
+        <div class="scores">
+          <div class="score-box">
+            <span class="score-label">Score</span>
+            <span id="score" class="score-value">0</span>
+          </div>
+          <div class="score-box">
+            <span class="score-label">Best</span>
+            <span id="best" class="score-value">0</span>
+          </div>
+        </div>
+      </header>
 
-    <div class="board-container">
-      <div id="board" class="board"></div>
-      <div id="overlay" class="overlay hidden">
-        <div class="overlay-content">
-          <p id="overlay-message" class="overlay-message">Game Over</p>
-          <button id="overlay-btn" class="btn">Try Again</button>
+      <div class="toolbar">
+        <button id="game-menu" class="btn btn-ghost">Menu</button>
+        <button id="new-game" class="btn">New Game</button>
+      </div>
+
+      <div class="board-container">
+        <div id="board" class="board"></div>
+        <div id="overlay" class="overlay hidden">
+          <div class="overlay-content">
+            <p id="overlay-message" class="overlay-message">Game Over</p>
+            <div class="overlay-actions">
+              <button id="overlay-btn" class="btn">Try Again</button>
+              <button id="overlay-menu-btn" class="btn btn-secondary">Menu</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <footer class="footer">
-      <p>Use arrow keys or swipe to move the tiles.</p>
-    </footer>
+      <footer class="footer">
+        <p>Use arrow keys or swipe to move the tiles.</p>
+      </footer>
+    </section>
+
   </div>
 
   <script src="script.js"></script>
