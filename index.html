@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+  <title>2048</title>
+  <meta name="description" content="A clean, minimal 2048 game." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23edc22e%22/><text x=%2250%22 y=%2268%22 font-size=%2250%22 font-family=%22sans-serif%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22white%22>2</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="header">
+      <h1 class="title">2048</h1>
+      <div class="scores">
+        <div class="score-box">
+          <span class="score-label">Score</span>
+          <span id="score" class="score-value">0</span>
+        </div>
+        <div class="score-box">
+          <span class="score-label">Best</span>
+          <span id="best" class="score-value">0</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <p class="hint">Join the tiles, get to <strong>2048!</strong></p>
+      <button id="new-game" class="btn">New Game</button>
+    </div>
+
+    <div class="board-container">
+      <div id="board" class="board"></div>
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-content">
+          <p id="overlay-message" class="overlay-message">Game Over</p>
+          <button id="overlay-btn" class="btn">Try Again</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>Use arrow keys or swipe to move the tiles.</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
