@@ -25,6 +25,10 @@
   box-sizing: border-box;
 }
 
+html {
+  overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -35,6 +39,9 @@ body {
   color: var(--text-dark);
   font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  overscroll-behavior: none;
+  touch-action: manipulation;
 }
 
 .wrap {
@@ -256,7 +263,9 @@ body {
   padding: 12px;
   aspect-ratio: 1 / 1;
   touch-action: none;
+  overscroll-behavior: none;
   user-select: none;
+  contain: layout style;
 }
 
 .cell {
@@ -264,8 +273,21 @@ body {
   border-radius: 6px;
 }
 
+/* Outer element owns position/size only, animated via transform (GPU-composited,
+   no layout/paint of siblings) so it never fights the inner element's scale animations. */
 .tile {
   position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  transition: transform 0.12s ease-in-out;
+  backface-visibility: hidden;
+}
+
+/* Inner element owns visuals (color, text, pop/merge animations). */
+.tile-inner {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -273,8 +295,8 @@ body {
   font-weight: 700;
   background: var(--tile-2);
   color: var(--text-dark);
-  transition: top 0.12s ease-in-out, left 0.12s ease-in-out;
   animation: pop 0.15s ease;
+  will-change: transform;
 }
 
 @keyframes pop {
@@ -303,23 +325,23 @@ body {
   }
 }
 
-.tile.merged {
+.tile-inner.merged {
   animation: merge-pop 0.15s ease;
   z-index: 2;
 }
 
-.tile[data-value="2"] { background: var(--tile-2); color: var(--text-dark); }
-.tile[data-value="4"] { background: var(--tile-4); color: var(--text-dark); }
-.tile[data-value="8"] { background: var(--tile-8); color: var(--text-light); }
-.tile[data-value="16"] { background: var(--tile-16); color: var(--text-light); }
-.tile[data-value="32"] { background: var(--tile-32); color: var(--text-light); }
-.tile[data-value="64"] { background: var(--tile-64); color: var(--text-light); }
-.tile[data-value="128"] { background: var(--tile-128); color: var(--text-light); font-size: 0.9em; }
-.tile[data-value="256"] { background: var(--tile-256); color: var(--text-light); font-size: 0.9em; }
-.tile[data-value="512"] { background: var(--tile-512); color: var(--text-light); font-size: 0.9em; }
-.tile[data-value="1024"] { background: var(--tile-1024); color: var(--text-light); font-size: 0.8em; }
-.tile[data-value="2048"] { background: var(--tile-2048); color: var(--text-light); font-size: 0.8em; box-shadow: 0 0 30px 4px rgba(243, 215, 116, 0.7); }
-.tile[data-value="4096"], .tile[data-value="8192"] { background: var(--tile-super); color: var(--text-light); font-size: 0.75em; }
+.tile-inner[data-value="2"] { background: var(--tile-2); color: var(--text-dark); }
+.tile-inner[data-value="4"] { background: var(--tile-4); color: var(--text-dark); }
+.tile-inner[data-value="8"] { background: var(--tile-8); color: var(--text-light); }
+.tile-inner[data-value="16"] { background: var(--tile-16); color: var(--text-light); }
+.tile-inner[data-value="32"] { background: var(--tile-32); color: var(--text-light); }
+.tile-inner[data-value="64"] { background: var(--tile-64); color: var(--text-light); }
+.tile-inner[data-value="128"] { background: var(--tile-128); color: var(--text-light); font-size: 0.9em; }
+.tile-inner[data-value="256"] { background: var(--tile-256); color: var(--text-light); font-size: 0.9em; }
+.tile-inner[data-value="512"] { background: var(--tile-512); color: var(--text-light); font-size: 0.9em; }
+.tile-inner[data-value="1024"] { background: var(--tile-1024); color: var(--text-light); font-size: 0.8em; }
+.tile-inner[data-value="2048"] { background: var(--tile-2048); color: var(--text-light); font-size: 0.8em; box-shadow: 0 0 30px 4px rgba(243, 215, 116, 0.7); }
+.tile-inner[data-value="4096"], .tile-inner[data-value="8192"] { background: var(--tile-super); color: var(--text-light); font-size: 0.75em; }
 
 .overlay {
   position: absolute;

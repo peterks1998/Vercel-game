@@ -260,12 +260,13 @@
       tiles.forEach((t) => {
         if (t.merged) {
           const el = tileElements.get(t.id);
-          if (!el) return;
-          el.textContent = String(t.value);
-          el.dataset.value = String(t.value);
-          el.classList.remove("merged");
-          void el.offsetWidth;
-          el.classList.add("merged");
+          const inner = el && el.firstElementChild;
+          if (!inner) return;
+          inner.textContent = String(t.value);
+          inner.dataset.value = String(t.value);
+          inner.classList.remove("merged");
+          void inner.offsetWidth;
+          inner.classList.add("merged");
         }
       });
 
@@ -295,27 +296,39 @@
   }
 
   // --- Rendering ---
+  // Position is set via `transform: translate3d` (GPU-composited, no layout/paint)
+  // rather than top/left, so sliding stays smooth even on low-power devices.
+  // Sizing (width/height/font-size) only changes on creation or resize, and is
+  // kept separate from positioning so every move only ever writes a transform.
   function measure() {
     const rect = board.getBoundingClientRect();
     cellSize = (rect.width - gap * (SIZE + 1)) / SIZE;
   }
 
+  function sizeTile(el) {
+    el.style.width = `${cellSize}px`;
+    el.style.height = `${cellSize}px`;
+    el.style.fontSize = `${cellSize * 0.42}px`;
+  }
+
   function positionTile(el, r, c) {
     const top = gap + r * (cellSize + gap);
     const left = gap + c * (cellSize + gap);
-    el.style.width = `${cellSize}px`;
-    el.style.height = `${cellSize}px`;
-    el.style.top = `${top}px`;
-    el.style.left = `${left}px`;
-    el.style.fontSize = `${cellSize * 0.42}px`;
+    el.style.transform = `translate3d(${left}px, ${top}px, 0)`;
   }
 
   function createTileElement(tile) {
     const el = document.createElement("div");
     el.className = "tile";
-    el.dataset.value = String(tile.value);
-    el.textContent = String(tile.value);
+    sizeTile(el);
     positionTile(el, tile.r, tile.c);
+
+    const inner = document.createElement("div");
+    inner.className = "tile-inner";
+    inner.dataset.value = String(tile.value);
+    inner.textContent = String(tile.value);
+    el.appendChild(inner);
+
     board.appendChild(el);
     tileElements.set(tile.id, el);
     return el;
@@ -415,7 +428,13 @@
   window.addEventListener("resize", () => {
     if (!gameScreen.classList.contains("hidden")) {
       measure();
-      updatePositions();
+      tiles.forEach((t) => {
+        const el = tileElements.get(t.id);
+        if (el) {
+          sizeTile(el);
+          positionTile(el, t.r, t.c);
+        }
+      });
     }
   });
 
