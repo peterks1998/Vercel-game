@@ -275,19 +275,22 @@
       animating = false;
 
       if (won) {
-        showOverlay("You win! \u{1F389}", "Keep Going");
+        showOverlay("You win! \u{1F389}", "Keep Going", "win");
         won = false;
       } else if (!hasMoves()) {
         over = true;
         recordScoreOnce();
-        showOverlay("Game Over", "Try Again");
+        showOverlay("Game Over", "Try Again", "over");
       }
     }, MOVE_DURATION);
   }
 
-  function showOverlay(message, btnText) {
+  let overlayMode = "over";
+
+  function showOverlay(message, btnText, mode) {
     overlayMessage.textContent = message;
     overlayBtn.textContent = btnText;
+    overlayMode = mode;
     overlay.classList.remove("hidden");
   }
 
@@ -376,7 +379,13 @@
   );
 
   newGameBtn.addEventListener("click", startGame);
-  overlayBtn.addEventListener("click", startGame);
+  overlayBtn.addEventListener("click", () => {
+    if (overlayMode === "win") {
+      overlay.classList.add("hidden");
+    } else {
+      startGame();
+    }
+  });
 
   gameMenuBtn.addEventListener("click", () => {
     recordScoreOnce();
